@@ -4,7 +4,7 @@ package Sort::Half::Maker;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -12,26 +12,26 @@ our @EXPORT_OK = qw(make_halfsorter make_halfsort);
 
 sub make_halfsort {
     my %args = @_;
-    my $sort_sub = $args{any} || sub { $_[0] cmp $_[1] };
-    my %pre_hash;
-    if ($args{pre}) {
-        my @pre = @{$args{pre}};
-        @pre_hash{@pre} = (1..@pre);
+    my $sort_sub = $args{fallback} || sub ($$) { $_[0] cmp $_[1] };
+    my %start_hash;
+    if ($args{start}) {
+        my @start = @{$args{start}};
+        @start_hash{@start} = (1..@start);
     }
-    my %post_hash;
-    if ($args{post}) {
-        my @post = @{$args{post}};
-        @post_hash{@post} = (1..@post);
+    my %end_hash;
+    if ($args{end}) {
+        my @end = @{$args{end}};
+        @end_hash{@end} = (1..@end);
     }
     return sub ($$) {
                my ($left, $right) = @_;
-               if ($pre_hash{$left} || $pre_hash{$right}) {
-                   my $ia = $pre_hash{$left} || keys(%pre_hash)+1;
-                   my $ib = $pre_hash{$right} || keys(%pre_hash)+1;
+               if ($start_hash{$left} || $start_hash{$right}) {
+                   my $ia = $start_hash{$left} || keys(%start_hash)+1;
+                   my $ib = $start_hash{$right} || keys(%start_hash)+1;
                    return $ia <=> $ib;
-               } elsif ($post_hash{$left} || $post_hash{$right}) {
-                   my $ia = $post_hash{$left} || 0;
-                   my $ib = $post_hash{$right} || 0;
+               } elsif ($end_hash{$left} || $end_hash{$right}) {
+                   my $ia = $end_hash{$left} || 0;
+                   my $ib = $end_hash{$right} || 0;
                    return $ia <=> $ib;
                } else {
                    return $sort_sub->($left, $right);
@@ -86,9 +86,9 @@ Sort::Half::Maker - Create half-sort subs easily
     use Sort::Half::Maker qw(make_halfsort);
 
     $sub = make_halfsort( 
-                  pre => [ qw(x y z) ],
-                  post => [ qw(a b c) ],
-                  any => sub { $_[0] cmp $_[1] },
+                  start => [ qw(x y z) ],
+                  end => [ qw(a b c) ],
+                  fallback => sub { $_[0] cmp $_[1] },
     );
     @list = sort $sub qw(a y f h w z b t x);
     # qw(x y z f h t w a b)
@@ -115,9 +115,9 @@ using case-insensitive comparison in-between. With this
 module, this is done so:
 
     $sub = make_halfsort(
-               pre => [ qw(name version abstract license author) ],
-               post => [ qw(meta-spec) ],
-               any => sub { lc $_[0] cmp lc $_[1] }
+               start => [ qw(name version abstract license author) ],
+               end => [ qw(meta-spec) ],
+               fallback => sub { lc $_[0] cmp lc $_[1] }
            );
     my @pairs = map { ($_, $h{$_}) } sort $sub keys(%h);
 
@@ -136,8 +136,26 @@ extra information.
 
 =item B<make_halfsort>
 
-    $sub = make_halfsort(per => \@start, post => \@end, any => $sub);
+    $sub = make_halfsort(start => \@start_list, 
+                         end => \@end_list, 
+                         fallback => &\sort_sub
+           );
     @sorted = sort $sub @unsorted;
+
+Builds a sort subroutine which can be used with C<sort>.
+It splits the sorted list into (possibly) three partitions:
+the elements contained in C<@start_list>, the elements
+contained in C<@end_list> and the remaining ones.
+For the elements in C<@start_list> and C<@end_list>,
+the list order is preserved. For the remaining ones,
+the given sort sub (or the default) is used.
+
+If C<fallback> is ommited, it defaults to use the sort sub
+C<sub ($$) { $_[0] cmp $_[1] }>. 
+
+The arguments C<start> or C<end> may be ommited as well. 
+But if you omit both, you could have done it without
+a half-sort ;)
 
 =begin comment
 

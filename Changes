@@ -1,4 +1,13 @@
 Revision history for Perl extension Sort::Half::Maker.
 
+0.02 
+          - BEWARE! incompatible change: overhaul in argument names 
+            for &make_halfsort -
+                make_halfsort(pre => \@s, post => \@e, any => \&s)
+                    becomes
+                make_halfsort(start => \@s, end => \@e, fallback => \&s)
+          - added LICENSE to Makefile.PL
+          - fixed MANIFEST for CPANTS sake
+
 0.01 Wed Feb 21 2007
           - absolute beginning
