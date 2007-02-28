@@ -4,7 +4,7 @@ package Sort::Half::Maker;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require Exporter;
 our @ISA = qw(Exporter);
@@ -16,12 +16,16 @@ sub make_halfsort {
     my %start_hash;
     if ($args{start}) {
         my @start = @{$args{start}};
-        @start_hash{@start} = (1..@start);
+        #@start_hash{@start} = (1..@start);
+        my $idx = 1;
+        for (@start) { $start_hash{$_} = $idx unless exists $start_hash{$_}; $idx++ };
     }
     my %end_hash;
     if ($args{end}) {
         my @end = @{$args{end}};
-        @end_hash{@end} = (1..@end);
+        #@end_hash{@end} = (1..@end);
+        my $idx = 1; # the same as "@end_hash{@end} = (1..@end)" but keeps the first occurrence
+        for (@end) { $end_hash{$_} = $idx unless exists $end_hash{$_}; $idx++ };
     }
     return sub ($$) {
                my ($left, $right) = @_;

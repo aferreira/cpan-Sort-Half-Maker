@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Sort-Half-Maker
-version:             0.02
+version:             0.03
 abstract:            Create half-sort subs easily
 license:             perl
 generated_by:        ExtUtils::MakeMaker version 6.32
