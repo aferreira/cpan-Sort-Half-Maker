@@ -7,40 +7,48 @@ use warnings;
 our $VERSION = '0.03';
 
 require Exporter;
-our @ISA = qw(Exporter);
+our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(make_halfsorter make_halfsort);
 
 sub make_halfsort {
     my %args = @_;
     my $sort_sub = $args{fallback} || sub ($$) { $_[0] cmp $_[1] };
     my %start_hash;
-    if ($args{start}) {
-        my @start = @{$args{start}};
+    if ( $args{start} ) {
+        my @start = @{ $args{start} };
+
         #@start_hash{@start} = (1..@start);
         my $idx = 1;
-        for (@start) { $start_hash{$_} = $idx unless exists $start_hash{$_}; $idx++ };
+        for (@start) {
+            $start_hash{$_} = $idx unless exists $start_hash{$_};
+            $idx++;
+        }
     }
     my %end_hash;
-    if ($args{end}) {
-        my @end = @{$args{end}};
+    if ( $args{end} ) {
+        my @end = @{ $args{end} };
+
         #@end_hash{@end} = (1..@end);
-        my $idx = 1; # the same as "@end_hash{@end} = (1..@end)" but keeps the first occurrence
-        for (@end) { $end_hash{$_} = $idx unless exists $end_hash{$_}; $idx++ };
+        my $idx = 1
+          ; # the same as "@end_hash{@end} = (1..@end)" but keeps the first occurrence
+        for (@end) { $end_hash{$_} = $idx unless exists $end_hash{$_}; $idx++ }
     }
     return sub ($$) {
-               my ($left, $right) = @_;
-               if ($start_hash{$left} || $start_hash{$right}) {
-                   my $ia = $start_hash{$left} || keys(%start_hash)+1;
-                   my $ib = $start_hash{$right} || keys(%start_hash)+1;
-                   return $ia <=> $ib;
-               } elsif ($end_hash{$left} || $end_hash{$right}) {
-                   my $ia = $end_hash{$left} || 0;
-                   my $ib = $end_hash{$right} || 0;
-                   return $ia <=> $ib;
-               } else {
-                   return $sort_sub->($left, $right);
-               }
-    }
+        my ( $left, $right ) = @_;
+        if ( $start_hash{$left} || $start_hash{$right} ) {
+            my $ia = $start_hash{$left}  || keys(%start_hash) + 1;
+            my $ib = $start_hash{$right} || keys(%start_hash) + 1;
+            return $ia <=> $ib;
+        }
+        elsif ( $end_hash{$left} || $end_hash{$right} ) {
+            my $ia = $end_hash{$left}  || 0;
+            my $ib = $end_hash{$right} || 0;
+            return $ia <=> $ib;
+        }
+        else {
+            return $sort_sub->( $left, $right );
+        }
+      }
 
 }
 
@@ -89,7 +97,7 @@ Sort::Half::Maker - Create half-sort subs easily
 
     use Sort::Half::Maker qw(make_halfsort);
 
-    $sub = make_halfsort( 
+    $sub = make_halfsort(
                   start => [ qw(x y z) ],
                   end => [ qw(a b c) ],
                   fallback => sub { $_[0] cmp $_[1] },
@@ -112,10 +120,10 @@ the given ordinary sort subroutine.
 
 An example, please?
 
-Imagine we want to sort the list of key/value pairs 
+Imagine we want to sort the list of key/value pairs
 of a hash, such that C<qw(name version abstract license
 author)> come first and C<qw(meta-spec)> comes last,
-using case-insensitive comparison in-between. With this 
+using case-insensitive comparison in-between. With this
 module, this is done so:
 
     $sub = make_halfsort(
@@ -128,11 +136,11 @@ module, this is done so:
 Why is it good for?
 
 I don't see many uses for it. I played with the concept
-while writing a patch to improve META.yml generation 
+while writing a patch to improve META.yml generation
 by ExtUtils::MakeMaker. There we wanted to dump some
 keys (like name, version, abstract, license, author) before
 and then the ones the module author provided as
-extra information. 
+extra information.
 
 =head2 FUNCTIONS
 
@@ -140,8 +148,8 @@ extra information.
 
 =item B<make_halfsort>
 
-    $sub = make_halfsort(start => \@start_list, 
-                         end => \@end_list, 
+    $sub = make_halfsort(start => \@start_list,
+                         end => \@end_list,
                          fallback => &\sort_sub
            );
     @sorted = sort $sub @unsorted;
@@ -155,9 +163,9 @@ the list order is preserved. For the remaining ones,
 the given sort sub (or the default) is used.
 
 If C<fallback> is ommited, it defaults to use the sort sub
-C<sub ($$) { $_[0] cmp $_[1] }>. 
+C<sub ($$) { $_[0] cmp $_[1] }>.
 
-The arguments C<start> or C<end> may be ommited as well. 
+The arguments C<start> or C<end> may be ommited as well.
 But if you omit both, you could have done it without
 a half-sort ;)
 
