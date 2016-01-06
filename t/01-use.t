@@ -1,6 +1,6 @@
 #!perl -T
 
-use Test::More no_plan => 1;
+use Test::More tests => 1;
 
 use_ok('Sort::Half::Maker');
 
