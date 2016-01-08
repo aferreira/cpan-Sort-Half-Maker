@@ -178,7 +178,7 @@ Arguments: pre, post, any, name
 
 =head1 SEE ALSO
 
-Sort::Maker
+L<Sort::Maker>
 
 =head1 BUGS
 
