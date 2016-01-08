@@ -178,7 +178,7 @@ Arguments: pre, post, any, name
 
 =head1 SEE ALSO
 
-Sort::Maker
+L<Sort::Maker>
 
 =head1 BUGS
 
@@ -187,6 +187,10 @@ Please report bugs via CPAN RT L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sort-H
 =head1 AUTHOR
 
 Adriano R. Ferreira, E<lt>ferreira@cpan.orgE<gt>
+
+=head1 REPOSITORY
+
+L<https://github.com/aferreira/cpan-Sort-Half-Maker>
 
 =head1 COPYRIGHT AND LICENSE
 
